@@ -1,0 +1,11 @@
+
+file			line	change
+
+core_cm7.h		105		remove error
+arm_math.h		318		#define ARM_MATH_CM7
+(added include for Drivers/CMSIS/DSP_Lib/Include)
+DSP_Lib					added Include folder with following files:
+						arm_common_tables.h
+						arm_const_structs.h
+						arm_math.h
+fixed inconsistencies of underscores in arm_const_structs.h and made a copy of the file in documents.

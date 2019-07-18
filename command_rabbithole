@@ -1,0 +1,58 @@
+
+spi_cmd()
+
+cmd			= ca (header + DMA single-word read)
+adr			= e824
+u32data		= 0
+sz			= 4
+clockless	= 0
+
+case CMD_INTERNAL_READ:
+	bc[1] = adr >> 8
+	bc[2] = adr
+	bc[3] = 0x00
+	len = 5
+	break;
+	
+bc[len-1] = crc7()
+
+nmi_spi_write(bc, len)
+
+tstrNmSpiRw spi {
+	pu8InBuf = bc;
+	pu8OutBuf = NULL;
+	u16Sz = len;
+}
+
+nm_bus_ioctl(NM_BUS_IOCTL_RW, spi)	// NM_BUS_IOCTL_RW = 3
+
+case NM_BUS_IOCTL_RW:{
+	tstrNmSpiRw *pstrParam = (tstrNmSpiRw *)pvParameter;
+	spi_rw(pstrParam-> pu8OutBuf, pstrParam->pu8InBuf, pstrParam->u16Sz);
+}
+
+spi_rw()
+
+	uint8_t txd_data = 0;
+	uint8_t rxd_data = 0;
+
+	pu8Mosi	= NULL
+	pu8Miso	= bc	// {0xCA, 0x00, 0xE8, 0x24, 0xBC}
+	u16Sz	= 5
+
+	HAL_GPIO_WritePin(A, 8, RESET)	// Slave select low
+
+	while (u16sz) {
+		txd_data = *pu8mosi;
+		HAL_SPI_TransmitReceive()
+			Handle	= &hspi2
+			txdata	= &txd_data
+			rxdata	= &rxd_data
+			size	= 1
+			timeout	= 1000
+			
+		u16sz--;
+		pu8Mosi++;
+	}
+
+	HAL_GPIO_WritePin(A, 8, SET)	// Slave select high
